@@ -139,6 +139,8 @@
   }
 
   html {
+    /* The app is light-only: keep native widgets (date pickers, select menus) light even in OS dark mode. */
+    color-scheme: light;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
     scroll-behavior: smooth;

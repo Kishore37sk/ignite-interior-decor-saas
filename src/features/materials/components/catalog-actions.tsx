@@ -3,6 +3,7 @@
 import { Pencil, Plus, Power, PowerOff } from "lucide-react";
 import { useId, useState, useTransition, type FormEvent, type ReactNode } from "react";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Dialog,
@@ -22,6 +23,16 @@ import type { FieldErrors } from "@/lib/action-result";
 import { MATERIAL_UNITS } from "@/lib/constants";
 import { saveCatalogItemAction, setCatalogItemActiveAction } from "../actions";
 import { useActionRunner } from "./use-action-runner";
+
+const UNIT_OPTIONS = MATERIAL_UNITS.map((unit) => ({ value: unit }));
+
+/** Active categories, plus the saved item's category if it was since hidden (never typed text). */
+function categoryOptions(categories: readonly string[], saved: string | null | undefined) {
+  const names = [...categories];
+  const name = saved?.trim();
+  if (name && !names.some((existing) => existing.toLowerCase() === name.toLowerCase())) names.push(name);
+  return names.map((value) => ({ value }));
+}
 
 export type CatalogItemValues = {
   id: string;
@@ -96,36 +107,29 @@ export function CatalogItemDialog({ item, categories, trigger }: CatalogItemDial
             <DialogDescription>Catalog materials can be picked quickly when raising a request.</DialogDescription>
           </DialogHeader>
           <DialogBody className="flex flex-col gap-4">
-            <datalist id={`${baseId}-cats`}>
-              {categories.map((name) => (
-                <option key={name} value={name} />
-              ))}
-            </datalist>
-            <datalist id={`${baseId}-units`}>
-              {MATERIAL_UNITS.map((unit) => (
-                <option key={unit} value={unit} />
-              ))}
-            </datalist>
             <FormField label="Name" required error={errors.name}>
               <Input value={values.name} maxLength={160} onChange={(e) => setValues((v) => ({ ...v, name: e.target.value }))} placeholder="e.g. OPC Cement 53 Grade" />
             </FormField>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <FormField label="Category" error={errors.category}>
-                <Input
-                  list={`${baseId}-cats`}
-                  autoComplete="off"
+                <Combobox
+                  listLabel="Categories"
+                  options={categoryOptions(categories, item?.category)}
+                  allowCustom={false}
+                  emptyMessage="No category matches. Manage categories in Settings."
                   maxLength={80}
+                  placeholder="Select category"
                   value={values.category}
-                  onChange={(e) => setValues((v) => ({ ...v, category: e.target.value }))}
+                  onValueChange={(category) => setValues((v) => ({ ...v, category }))}
                 />
               </FormField>
               <FormField label="Unit" required error={errors.unit}>
-                <Input
-                  list={`${baseId}-units`}
-                  autoComplete="off"
+                <Combobox
+                  listLabel="Units"
+                  options={UNIT_OPTIONS}
                   maxLength={32}
                   value={values.unit}
-                  onChange={(e) => setValues((v) => ({ ...v, unit: e.target.value }))}
+                  onValueChange={(unit) => setValues((v) => ({ ...v, unit }))}
                   placeholder="Bags"
                 />
               </FormField>

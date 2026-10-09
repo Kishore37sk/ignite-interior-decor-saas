@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useId, useMemo, useRef, useState, useTransition, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
 import {
   Dialog,
   DialogBody,
@@ -121,9 +122,6 @@ const NETWORK_ERROR = "We couldn't reach the server. Check your connection and t
 export function RequestForm(props: RequestFormProps) {
   const router = useRouter();
   const baseId = useId().replace(/[^a-zA-Z0-9_-]/g, "");
-  const catalogListId = `${baseId}-catalog`;
-  const categoryListId = `${baseId}-categories`;
-  const unitListId = `${baseId}-units`;
   const today = todayIST();
   const isEdit = props.mode === "edit";
 
@@ -145,6 +143,36 @@ export function RequestForm(props: RequestFormProps) {
   );
   const [duplicate, setDuplicate] = useState<Extract<CreateRequestResult, { kind: "duplicate" }> | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+
+  const catalogOptions = useMemo<ComboboxOption[]>(
+    () =>
+      props.catalog.map((item) => ({
+        value: item.name,
+        description: [item.category, item.unit].filter(Boolean).join(" · ") || undefined,
+      })),
+    [props.catalog],
+  );
+  const unitOptions = useMemo<ComboboxOption[]>(() => MATERIAL_UNITS.map((unit) => ({ value: unit })), []);
+  /**
+   * Active categories, plus ones already in use by catalog materials or the request
+   * being edited (they may have been hidden since). Typed text never becomes an option.
+   */
+  const categoryOptions = useMemo<ComboboxOption[]>(() => {
+    const names = [...props.categories];
+    const known = new Set(names.map((name) => name.toLowerCase()));
+    const inUse = [
+      ...props.catalog.map((item) => item.category),
+      ...(props.mode === "edit" ? props.initial.items.map((item) => item.category) : []),
+    ];
+    for (const raw of inUse) {
+      const name = raw?.trim();
+      if (name && !known.has(name.toLowerCase())) {
+        known.add(name.toLowerCase());
+        names.push(name);
+      }
+    }
+    return names.map((name) => ({ value: name }));
+  }, [props]);
 
   const catalogByName = useMemo(() => {
     const map = new Map<string, RequestFormCatalogItem>();
@@ -296,24 +324,6 @@ export function RequestForm(props: RequestFormProps) {
   return (
     <>
       <form ref={formRef} onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
-        <datalist id={catalogListId}>
-          {props.catalog.map((item) => (
-            <option key={item.id} value={item.name}>
-              {[item.category, item.unit].filter(Boolean).join(" · ")}
-            </option>
-          ))}
-        </datalist>
-        <datalist id={categoryListId}>
-          {props.categories.map((name) => (
-            <option key={name} value={name} />
-          ))}
-        </datalist>
-        <datalist id={unitListId}>
-          {MATERIAL_UNITS.map((unit) => (
-            <option key={unit} value={unit} />
-          ))}
-        </datalist>
-
         <section className="card-surface flex flex-col gap-5 p-5 sm:p-6" aria-labelledby={`${baseId}-details`}>
           <h2 id={`${baseId}-details`} className="text-lg font-semibold tracking-tight text-text">
             Request details
@@ -432,27 +442,30 @@ export function RequestForm(props: RequestFormProps) {
                       className="col-span-2 sm:col-span-5"
                       hint={item.material_id ? "From catalog" : undefined}
                     >
-                      <Input
+                      <Combobox
                         data-field={`${prefix}.material_name`}
                         data-material-input=""
-                        list={catalogListId}
-                        autoComplete="off"
+                        listLabel="Materials"
+                        options={catalogOptions}
+                        emptyMessage="Not in the catalog — it will be requested as typed."
                         value={item.material_name}
                         maxLength={160}
                         placeholder="Search catalog or type"
-                        onChange={(e) => onMaterialChange(item.key, e.target.value)}
+                        onValueChange={(value) => onMaterialChange(item.key, value)}
                         className="h-12 text-base"
                       />
                     </FormField>
                     <FormField label="Category" error={err(`${prefix}.category`)} className="col-span-2 sm:col-span-3">
-                      <Input
+                      <Combobox
                         data-field={`${prefix}.category`}
-                        list={categoryListId}
-                        autoComplete="off"
+                        listLabel="Categories"
+                        options={categoryOptions}
+                        allowCustom={false}
+                        emptyMessage="No category matches. The owner manages categories in Settings."
                         value={item.category}
                         maxLength={80}
-                        placeholder="e.g. Civil"
-                        onChange={(e) => updateItem(item.key, { category: e.target.value })}
+                        placeholder="Select category"
+                        onValueChange={(value) => updateItem(item.key, { category: value })}
                         className="h-12 text-base"
                       />
                     </FormField>
@@ -469,14 +482,14 @@ export function RequestForm(props: RequestFormProps) {
                       />
                     </FormField>
                     <FormField label="Unit" required error={err(`${prefix}.unit`)} className="sm:col-span-2">
-                      <Input
+                      <Combobox
                         data-field={`${prefix}.unit`}
-                        list={unitListId}
-                        autoComplete="off"
+                        listLabel="Units"
+                        options={unitOptions}
                         value={item.unit}
                         maxLength={32}
                         placeholder="Bags"
-                        onChange={(e) => updateItem(item.key, { unit: e.target.value })}
+                        onValueChange={(value) => updateItem(item.key, { unit: value })}
                         className="h-12 text-base"
                       />
                     </FormField>

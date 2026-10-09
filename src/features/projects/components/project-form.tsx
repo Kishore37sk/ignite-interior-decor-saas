@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useState, useTransition, type FormEvent } from "react";
+import { useState, useTransition, type FormEvent } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { Combobox } from "@/components/ui/combobox";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
@@ -16,6 +17,8 @@ import type { PriorityLevel, ProjectStatus } from "@/types/database";
 import { createProjectAction, updateProjectAction, type ProjectSaveResult } from "../actions";
 import { PROJECT_TYPE_SUGGESTIONS } from "../constants";
 import { ClientCombobox, type ClientOption } from "./client-combobox";
+
+const PROJECT_TYPE_OPTIONS = PROJECT_TYPE_SUGGESTIONS.map((type) => ({ value: type }));
 
 export type ProjectFormDefaults = {
   client_id: string;
@@ -51,7 +54,7 @@ export type ProjectFormProps = {
 /** Owner project create/edit form (project, dates, status, cost, site manager). */
 export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, cancelHref }: ProjectFormProps) {
   const router = useRouter();
-  const typesListId = useId();
+  const [projectType, setProjectType] = useState(defaults.project_type);
   const [pending, startTransition] = useTransition();
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [formError, setFormError] = useState<string | null>(null);
@@ -124,13 +127,14 @@ export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, 
             <Input defaultValue={defaults.project_code} maxLength={20} className="uppercase" autoCapitalize="characters" />
           </FormField>
           <FormField label="Project type" name="project_type" error={err("project_type")} hint="Pick a suggestion or type your own.">
-            <Input defaultValue={defaults.project_type} maxLength={60} list={typesListId} />
+            <Combobox
+              listLabel="Project types"
+              options={PROJECT_TYPE_OPTIONS}
+              value={projectType}
+              onValueChange={setProjectType}
+              maxLength={60}
+            />
           </FormField>
-          <datalist id={typesListId}>
-            {PROJECT_TYPE_SUGGESTIONS.map((type) => (
-              <option key={type} value={type} />
-            ))}
-          </datalist>
           <FormField label="City" name="city" error={err("city")}>
             <Input defaultValue={defaults.city} maxLength={80} autoComplete="address-level2" />
           </FormField>
