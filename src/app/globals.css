@@ -1,0 +1,236 @@
+@import "tailwindcss";
+
+/*
+ * Ignite Interior Decor — design tokens (TeamHub design language, Ignite green brand).
+ * Light theme only for now; every colour is a token so a dark theme can be layered
+ * on later by redefining the CSS variables under a `[data-theme="dark"]` selector.
+ */
+@theme {
+  /* Typography — layout.tsx exposes Plus Jakarta Sans as the next/font variable --font-plus-jakarta on <html>. */
+  --font-sans:
+    var(--font-plus-jakarta), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Surfaces & text */
+  --color-background: #f5f6f4;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f5f6f4;
+  --color-surface-sunken: #eef0ec;
+  --color-border: #e4e7e2;
+  --color-border-soft: #eceeea;
+  --color-text: #14211c;
+  --color-muted: #5e6d66; /* secondary text — ≥4.8:1 on white, background, surface-sunken and soft (WCAG AA) */
+  --color-subtle: #9aa5a0; /* icons, placeholders and decoration only — 2.5:1, never for informative text */
+  --color-surface-hover: #f9faf8; /* interactive table rows */
+  --color-border-hover: #d3d8d1; /* hovered input borders */
+  --color-border-strong: #858f8a; /* checkbox / radio outlines — 3.3:1 on white (WCAG 1.4.11) */
+  --color-overlay: #0b1f19; /* modal / sheet scrim (used at 40% opacity) */
+
+  /* Brand */
+  --color-primary: #1a7f63; /* filled surfaces with white text — WCAG AA 4.9:1 */
+  --color-primary-hover: #156b53;
+  --color-brand: #2bb58f; /* bright TeamHub/Ignite teal: charts, progress, icons, accents (never under white text) */
+  --color-brand-hover: #239c7a;
+  --color-primary-strong: #1a7f63; /* AA-contrast primary for text on white */
+  --color-primary-foreground: #ffffff;
+  --color-deep: #0f4a3c;
+  --color-deep-hover: #0b382d;
+  --color-soft: #e6f4dd;
+  --color-soft-hover: #d8edcb;
+  --color-soft-strong: #cdebc0;
+  --color-lime: #9bd35a;
+  --color-grey: #c9cfcb;
+
+  /* Status */
+  --color-success: #1a7f63;
+  --color-success-bg: #e3f5ee;
+  --color-success-text: #17775c;
+  --color-warning: #e9a23b;
+  --color-warning-bg: #fdf3e1;
+  --color-warning-text: #8a5a12;
+  --color-danger: #c8353b;
+  --color-danger-hover: #a92c31;
+  --color-danger-bg: #fdecec;
+  --color-danger-text: #b42328;
+  --color-info: #3b82c4;
+  --color-info-bg: #e8f1fa;
+  --color-info-text: #245d92;
+
+  /* Avatar palettes (initials avatars) */
+  --color-avatar-mint: #d4f0e6;
+  --color-avatar-violet: #efe9fa;
+  --color-avatar-violet-text: #5b3b8c;
+  --color-avatar-rose: #fbe9f0;
+  --color-avatar-rose-text: #9c2d5a;
+
+  /* Radius */
+  --radius-card: 1rem;
+  --radius-control: 0.75rem;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px rgba(16, 24, 20, 0.04), 0 4px 16px rgba(16, 24, 20, 0.04);
+  --shadow-pop: 0 4px 12px rgba(16, 24, 20, 0.08), 0 16px 40px rgba(16, 24, 20, 0.12);
+
+  /* Motion */
+  --animate-fade-in: fade-in 150ms ease-out;
+  --animate-fade-out: fade-out 120ms ease-in;
+  --animate-pop-in: pop-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-sheet-up: sheet-up 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-right: slide-in-right 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-slide-in-left: slide-in-left 240ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  @keyframes sheet-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  @keyframes slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+}
+
+@layer base {
+  *,
+  ::before,
+  ::after {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: var(--color-soft-strong);
+    color: var(--color-deep);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary {
+    cursor: pointer;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.6;
+  }
+
+  /* Thin, quiet scrollbars like the reference UI. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-grey) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--color-grey);
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--color-subtle);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Component-level utilities */
+@utility card-surface {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-soft);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+
+@utility focus-ring {
+  outline: none;
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
