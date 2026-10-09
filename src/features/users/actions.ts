@@ -164,6 +164,25 @@ export async function createUserAction(formData: FormData): Promise<ActionResult
   }
   const userId = created.user.id;
 
+  // Supabase writes app_metadata after the auth.users INSERT, so the profile
+  // trigger can miss the role. Set it explicitly (service role: owner-checked above).
+  const { error: roleError } = await admin
+    .from("profiles")
+    .update({
+      role: values.role,
+      status: "active",
+      ...(values.employee_id ? { employee_id: values.employee_id } : {}),
+      ...(values.phone ? { phone: values.phone } : {}),
+    })
+    .eq("id", userId);
+  if (roleError) {
+    logServerError("users.create.role", roleError);
+    revalidateTeamPages(userId);
+    return fail(
+      `${values.full_name}'s login was created, but their role couldn't be saved. Open the user and try again, or contact support.`,
+    );
+  }
+
   const warnings: string[] = [];
   if (values.joining_date) {
     // Owner RLS client so the audit log attributes the change to the owner.
