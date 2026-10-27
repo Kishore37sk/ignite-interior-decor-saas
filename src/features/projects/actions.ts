@@ -364,8 +364,14 @@ export async function registerProjectDocumentAction(input: {
   return ok({ id: data.id }, "Document uploaded.");
 }
 
-/** Short-lived (60 s) signed download URL for a document the caller can read. */
-export async function getDocumentDownloadUrlAction(documentId: string): Promise<ActionResult<{ url: string }>> {
+/**
+ * Short-lived (60 s) signed URL for a document the caller can read: `download` saves the
+ * file, `view` opens it in the browser (PDFs, images).
+ */
+export async function getDocumentDownloadUrlAction(
+  documentId: string,
+  mode: "download" | "view" = "download",
+): Promise<ActionResult<{ url: string }>> {
   await requireUser();
   const id = uuid.safeParse(documentId);
   if (!id.success) return fail("We couldn't find that document.");
@@ -380,7 +386,7 @@ export async function getDocumentDownloadUrlAction(documentId: string): Promise<
   if (!doc) return fail("We couldn't find that document, or you don't have access to it.");
   const { data, error: signError } = await supabase.storage
     .from(PROJECT_DOCUMENTS_BUCKET)
-    .createSignedUrl(doc.storage_path, SIGNED_URL_TTL_SECONDS, { download: doc.file_name });
+    .createSignedUrl(doc.storage_path, SIGNED_URL_TTL_SECONDS, mode === "download" ? { download: doc.file_name } : undefined);
   if (signError || !data?.signedUrl) {
     return failFromError(signError, "We couldn't prepare the download. Please try again.", "projects.documentUrl.sign");
   }

@@ -70,7 +70,7 @@ export const PROJECT_TAB_LABELS: Record<ProjectTab, string> = {
   requests: "Material Requests",
   materials: "Materials",
   payments: "Payments",
-  documents: "Documents",
+  documents: "Design & Floor Map",
   activity: "Activity",
 };
 
@@ -84,7 +84,17 @@ export const PROJECT_TYPE_SUGGESTIONS: readonly string[] = Array.from(
     "Commercial",
     "Retail",
     "Hospitality",
-    ...FOUNDATION_PROJECT_TYPES,
+    ...FOUNDATION_PROJECT_TYPES.filter((type) => type !== "Other"),
+    "1BHK",
+    "2BHK",
+    "3BHK",
+    "Living Room",
+    "First Floor Living Room",
+    "Dining",
+    "Pooja Unit",
+    "TV Unit",
+    "Home Theatre",
+    "False Ceiling",
     "Other",
   ]),
 );

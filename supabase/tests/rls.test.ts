@@ -285,7 +285,7 @@ describe("admin isolation", () => {
     await t.asUser(w.admin2.id, async (tx) => {
       expect(await count(tx, "public.projects", "id = $1", [w.projectB])).toBe(1);
       expect(await count(tx, "public.project_updates")).toBe(0);
-      expect(await count(tx, "public.project_documents")).toBe(0);
+      // Documents ARE readable through request access since 0010 (documents-access.test.ts).
     });
   });
 

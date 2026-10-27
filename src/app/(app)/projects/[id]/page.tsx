@@ -67,8 +67,9 @@ export default async function ProjectDetailPage({ params, searchParams }: PagePr
   if (!project) notFound();
 
   const isOwner = user.role === "owner";
-  // Progress updates and documents are visible only to the owner and project members (RLS):
-  // hide those tabs from admins who reach the project through a material request.
+  // Progress updates are visible only to the owner and project members (RLS): hide that tab
+  // from admins who reach the project through a material request. Documents (Design & Floor
+  // Map) are view/download only for everyone who can open the project (0010).
   // Payments: the owner and members the owner granted financial access.
   const [memberOnlyTabs, financeTab] = await Promise.all([
     user.role !== "admin" || isActiveProjectMember(project.id),
@@ -76,7 +77,7 @@ export default async function ProjectDetailPage({ params, searchParams }: PagePr
   ]);
   const visibleTabs = PROJECT_TABS.filter(
     (value) =>
-      (memberOnlyTabs || (value !== "updates" && value !== "documents")) && (financeTab || value !== "payments"),
+      (memberOnlyTabs || value !== "updates") && (financeTab || value !== "payments"),
   );
   const requestedTab = parseEnumParam(query, "tab", PROJECT_TABS) ?? "overview";
   const tab = visibleTabs.includes(requestedTab) ? requestedTab : "overview";

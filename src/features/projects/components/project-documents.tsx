@@ -6,6 +6,7 @@ import {
   CircleCheck,
   CircleX,
   Download,
+  Eye,
   FileImage,
   FileSpreadsheet,
   FileText,
@@ -180,7 +181,7 @@ function FileIcon({ mimeType, className }: { mimeType: string | null; className?
   return <Icon aria-hidden="true" className={className} />;
 }
 
-/** Project documents: grouped list with thumbnails, upload (incl. camera capture), download and archive. */
+/** Project documents: grouped list with thumbnails, upload (incl. camera capture), view, download and archive. */
 export function ProjectDocuments({ projectId, documents, canUpload, uploadNote, canArchive }: ProjectDocumentsProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -269,6 +270,28 @@ export function ProjectDocuments({ projectId, documents, canUpload, uploadNote, 
     const files = Array.from(event.target.files ?? []);
     event.target.value = "";
     void uploadFiles(files, targetCategory);
+  }
+
+  async function view(doc: ProjectDocumentItem) {
+    // Open the tab synchronously (inside the click) so pop-up blockers allow it.
+    const tab = window.open("about:blank", "_blank");
+    setDownloading(`view-${doc.id}`);
+    const result = await getDocumentDownloadUrlAction(doc.id, "view").catch(() => ({
+      ok: false as const,
+      error: "We couldn't reach the server. Please try again.",
+    }));
+    setDownloading(null);
+    if (!result.ok) {
+      tab?.close();
+      toast.error(result.error);
+      return;
+    }
+    if (tab) {
+      tab.opener = null;
+      tab.location.href = result.data.url;
+    } else {
+      window.location.assign(result.data.url);
+    }
   }
 
   async function download(doc: ProjectDocumentItem) {
@@ -389,6 +412,11 @@ export function ProjectDocuments({ projectId, documents, canUpload, uploadNote, 
         <p role="status" className="rounded-2xl border border-border-soft bg-surface-muted px-4 py-3 text-sm text-muted">
           {uploadNote}
         </p>
+      ) : grouped.length > 0 ? (
+        <p className="flex items-center gap-2 rounded-2xl border border-border-soft bg-surface-muted px-4 py-3 text-sm text-muted">
+          <Eye aria-hidden="true" className="size-4 shrink-0" />
+          View and download only. The owner adds and archives these files.
+        </p>
       ) : null}
 
       {grouped.length === 0 ? (
@@ -399,7 +427,7 @@ export function ProjectDocuments({ projectId, documents, canUpload, uploadNote, 
             description={
               canUpload
                 ? "Upload site photos, drawings, bills or reports to keep everything about this project in one place."
-                : "Photos, drawings and reports uploaded by the team will appear here."
+                : "Designs, floor maps, drawings and photos shared by the owner and the site team appear here. You can view and download them."
             }
           />
         </div>
@@ -445,6 +473,17 @@ export function ProjectDocuments({ projectId, documents, canUpload, uploadNote, 
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-1 border-t border-border-soft px-2 py-1.5">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-11 sm:h-9"
+                      loading={downloading === `view-${doc.id}`}
+                      onClick={() => void view(doc)}
+                      aria-label={`View ${doc.fileName}`}
+                    >
+                      <Eye aria-hidden="true" />
+                      View
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
