@@ -52,8 +52,8 @@ export default async function PaymentStatementPage({ params }: PageProps) {
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6 sm:py-10 print:max-w-none print:py-0">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex flex-col gap-2">
+      <header className="flex flex-col items-start gap-4 sm:flex-row sm:justify-between">
+        <div className="flex flex-col items-start gap-2">
           {company?.logo_url ? (
             // eslint-disable-next-line @next/next/no-img-element -- arbitrary owner-provided logo URL
             <img src={company.logo_url} alt={companyName} className="h-11 w-auto max-w-[180px] object-contain" referrerPolicy="no-referrer" />

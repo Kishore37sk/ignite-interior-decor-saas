@@ -2,7 +2,7 @@ import { Banknote, CreditCard, FileText, Landmark, Smartphone, Wallet, type Luci
 import { CurrencyText } from "@/components/shared/currency-text";
 import { ProgressBar } from "@/components/shared/progress-bar";
 import { PAYMENT_MODE_LABELS } from "@/lib/constants";
-import { formatPercent, pluralize } from "@/lib/format";
+import { pluralize } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { PaymentMode } from "@/types/database";
 import type { PaymentTotals } from "../statement";
@@ -51,10 +51,7 @@ export function PaymentTotalsGrid({ totals, paymentCount }: { totals: PaymentTot
         />
       </dl>
       {totals.projectCost > 0 ? (
-        <div className="flex flex-col gap-1.5">
-          <ProgressBar value={totals.percentPaid} label="Share of project value received" tone="primary" size="md" />
-          <p className="text-xs text-muted">{formatPercent(totals.percentPaid, 0)} of the project value received</p>
-        </div>
+        <ProgressBar value={totals.percentPaid} label="Project value received" showLabel tone="primary" size="md" />
       ) : null}
     </div>
   );
