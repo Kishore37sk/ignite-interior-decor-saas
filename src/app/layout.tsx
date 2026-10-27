@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 import { Toaster } from "sonner";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BRAND } from "@/lib/constants";
 import { getSiteUrl } from "@/lib/env";
 import "./globals.css";
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           closeButton
           toastOptions={{ className: "rounded-xl" }}
         />
+        <SpeedInsights />
       </body>
     </html>
   );
