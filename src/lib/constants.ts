@@ -5,6 +5,7 @@ import type {
   MaterialRequestStatus,
   MemberRole,
   MilestoneStatus,
+  PaymentMode,
   PriorityLevel,
   ProjectStatus,
   RequiredState,
@@ -77,6 +78,14 @@ export const DOCUMENT_CATEGORIES = [
   "site_reports",
   "other",
 ] as const satisfies readonly DocumentCategory[];
+export const PAYMENT_MODES = [
+  "upi",
+  "cash",
+  "card",
+  "bank_transfer",
+  "cheque",
+  "other",
+] as const satisfies readonly PaymentMode[];
 
 /* -------------------------------------------------------------------------- */
 /* Labels                                                                     */
@@ -142,6 +151,15 @@ export const DOCUMENT_CATEGORY_LABELS: Record<DocumentCategory, string> = {
   drawings: "Drawings",
   material_documents: "Material Documents",
   site_reports: "Site Reports",
+  other: "Other",
+};
+
+export const PAYMENT_MODE_LABELS: Record<PaymentMode, string> = {
+  upi: "UPI",
+  cash: "Cash",
+  card: "Card",
+  bank_transfer: "Bank Transfer",
+  cheque: "Cheque",
   other: "Other",
 };
 

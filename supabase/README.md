@@ -14,6 +14,12 @@ Postgres schema, row level security, RPCs, views, storage and realtime setup for
 | `migrations/0005_rpc_functions.sql` | every `supabase.rpc` function, plus `promote_to_owner` (service role only) |
 | `migrations/0006_views_and_analytics.sql` | `project_directory`, `project_financial_summary`, `client_directory`, `material_request_directory`, `material_request_item_directory`, `project_material_summary`, `team_directory`, `activity_feed` |
 | `migrations/0007_storage_realtime_cron.sql` | private `project-documents` bucket and policies, realtime publication, pg_cron job, final privilege lockdown |
+| `migrations/0008_profile_role_from_app_metadata.sql` | copy role / employee ID from `app_metadata` set after the auth.users insert |
+| `migrations/0009_project_payments.sql` | `project_payments` ledger (cash, card, UPI, ...), `project_payment_links` share tokens, `get_payment_statement` (the only anon-callable function), received total in `project_financial_summary`, backfill of earlier advances |
+
+Payment statements: `/statement/<token>` is public. It calls `get_payment_statement(token)`, which returns totals,
+the split by mode and the payment list (no internal notes) for a valid token, and NULL otherwise. Only the owner
+can read, regenerate or delete a token.
 
 Material cost privacy: API roles cannot select `approved_cost` / `actual_cost` (and the variance basis
 columns) of `material_requests`, nor `approved_unit_cost` / `actual_unit_cost` of `material_request_items`,

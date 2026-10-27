@@ -57,6 +57,7 @@ export const PROJECT_TABS = [
   "updates",
   "requests",
   "materials",
+  "payments",
   "documents",
   "activity",
 ] as const;
@@ -68,6 +69,7 @@ export const PROJECT_TAB_LABELS: Record<ProjectTab, string> = {
   updates: "Progress Updates",
   requests: "Material Requests",
   materials: "Materials",
+  payments: "Payments",
   documents: "Documents",
   activity: "Activity",
 };

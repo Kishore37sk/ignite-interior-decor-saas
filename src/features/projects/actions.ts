@@ -77,13 +77,10 @@ async function saveProjectExtras(
 ): Promise<string[]> {
   const warnings: string[] = [];
 
-  const financials = {
-    project_cost: values.project_cost ?? 0,
-    advance_received: values.advance_received ?? 0,
-  };
+  // Amount received lives in project_payments (the advance is recorded by createProjectAction).
   const { error: finError } = await supabase
     .from("project_financials")
-    .upsert({ project_id: projectId, ...financials }, { onConflict: "project_id" });
+    .upsert({ project_id: projectId, project_cost: values.project_cost ?? 0 }, { onConflict: "project_id" });
   if (finError) {
     logServerError("projects.saveFinancials", finError);
     warnings.push(`the project cost couldn't be saved (${friendlyMessage(finError)})`);
@@ -147,6 +144,18 @@ export async function createProjectAction(formData: FormData): Promise<ActionRes
   }
 
   const warnings = await saveProjectExtras(supabase, data.id, values, []);
+  if (values.advance_received && values.advance_received > 0) {
+    const { error: advanceError } = await supabase.from("project_payments").insert({
+      project_id: data.id,
+      amount: values.advance_received,
+      mode: values.advance_mode ?? "other",
+      notes: "Advance entered when the project was created.",
+    });
+    if (advanceError) {
+      logServerError("projects.create.advance", advanceError);
+      warnings.push(`the advance couldn't be recorded (${friendlyMessage(advanceError)}); add it from the Payments tab`);
+    }
+  }
   revalidateProject(data.id, values.client_id);
   return ok({ id: data.id, warning: warnings.length > 0 }, withWarnings("Project created.", warnings));
 }

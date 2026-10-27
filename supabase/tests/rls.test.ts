@@ -10,6 +10,8 @@ const TABLES = [
   "clients",
   "projects",
   "project_financials",
+  "project_payments",
+  "project_payment_links",
   "project_members",
   "project_milestones",
   "project_updates",
@@ -66,13 +68,15 @@ describe("schema hardening", () => {
     expect(rows).toEqual([]);
   });
 
-  it("does not let anon or PUBLIC execute any public function", async () => {
+  it("does not let anon or PUBLIC execute any public function except the payment statement", async () => {
     const rows = await t.sql<{ proname: string }>(
       `select p.proname from pg_proc p join pg_namespace n on n.oid = p.pronamespace
        where n.nspname = 'public'
          and (has_function_privilege('anon', p.oid, 'execute'))`,
     );
-    expect(rows.map((r) => r.proname)).toEqual([]);
+    // get_payment_statement is the public share-link entry point (0009); it returns
+    // NULL unless given a valid secret token.
+    expect(rows.map((r) => r.proname)).toEqual(["get_payment_statement"]);
   });
 
   it("sets an explicit empty search_path on every public function", async () => {

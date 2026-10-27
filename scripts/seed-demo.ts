@@ -404,9 +404,31 @@ async function main(): Promise<void> {
     checkOk(
       await admin
         .from("project_financials")
-        .update({ project_cost: p.cost, advance_received: p.advance, notes: "Demo contract value." })
+        .update({ project_cost: p.cost, notes: "Demo contract value." })
         .eq("project_id", row.id),
       `Financials ${p.name}`,
+    );
+
+    // Amount received = payments ledger: a booking transfer, then the rest by UPI (small jobs: cash).
+    const booking = p.advance >= 200_000 ? Math.round(p.advance * 0.6) : p.advance;
+    const payments = [
+      { amount: booking, mode: p.advance >= 200_000 ? "bank_transfer" : "cash", paid_on: day(p.start), reference: null },
+      ...(booking < p.advance
+        ? [{ amount: p.advance - booking, mode: "upi", paid_on: day(Math.round(p.start / 2)), reference: `UPI${row.project_code.replace(/\D/g, "")}01` }]
+        : []),
+    ] as const;
+    checkOk(
+      await admin.from("project_payments").insert(
+        payments.map((pay) => ({
+          project_id: row.id,
+          amount: pay.amount,
+          mode: pay.mode,
+          paid_on: pay.paid_on ?? TODAY,
+          reference: pay.reference,
+          created_by: ownerId,
+        })),
+      ),
+      `Payments ${p.name}`,
     );
 
     checkOk(

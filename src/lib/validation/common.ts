@@ -15,6 +15,7 @@ import {
   MILESTONE_STATUSES,
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
+  PAYMENT_MODES,
   PRIORITY_LEVELS,
   PROJECT_STATUSES,
   USER_STATUSES,
@@ -204,6 +205,7 @@ export const memberRoleSchema = z.enum(MEMBER_ROLES, { error: "Choose a valid ro
 export const documentCategorySchema = z.enum(DOCUMENT_CATEGORIES, {
   error: "Choose a valid category.",
 });
+export const paymentModeSchema = z.enum(PAYMENT_MODES, { error: "Choose how the client paid." });
 
 /* -------------------------------------------------------------------------- */
 /* Auth                                                                       */

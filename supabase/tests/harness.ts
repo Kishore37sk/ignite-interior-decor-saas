@@ -170,8 +170,10 @@ export class TestDatabase {
   /**
    * Boots Postgres with the Supabase stub, then applies either every migration
    * (default) or the given bundled SQL (used to verify supabase/setup.sql).
+   * `before` stops at the first migration whose file name sorts at or after it
+   * (used to test a migration's backfill against existing data).
    */
-  static async create(options: { setupSql?: string } = {}): Promise<TestDatabase> {
+  static async create(options: { setupSql?: string; before?: string } = {}): Promise<TestDatabase> {
     const db = await PGlite.create({ extensions: { pg_trgm } });
     await db.exec(SUPABASE_STUB_SQL);
     if (options.setupSql !== undefined) {
@@ -179,6 +181,7 @@ export class TestDatabase {
       return new TestDatabase(db);
     }
     for (const file of listMigrationFiles()) {
+      if (options.before !== undefined && file >= options.before) break;
       const sql = readFileSync(join(MIGRATIONS_DIR, file), "utf8");
       try {
         await db.exec(sql);
@@ -192,6 +195,11 @@ export class TestDatabase {
 
   async close(): Promise<void> {
     await this.db.close();
+  }
+
+  /** Apply one migration file as the database owner. */
+  async applyMigration(file: string): Promise<void> {
+    await this.db.exec(readFileSync(join(MIGRATIONS_DIR, file), "utf8"));
   }
 
   /** Run as the database owner (postgres, bypasses RLS). */

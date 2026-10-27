@@ -223,10 +223,21 @@ export async function OverviewTab({ project, user, canPostUpdate }: OverviewTabP
 
       <div className="flex min-w-0 flex-col gap-6">
         {financials ? (
-          <SectionCard title="Financials" description={isOwner ? "Visible to you and members you allow." : "Shared with you by the owner."}>
+          <SectionCard
+            title="Financials"
+            description={isOwner ? "Visible to you and members you allow." : "Shared with you by the owner."}
+            action={
+              <Button size="sm" variant="ghost" asChild>
+                <Link href={`/projects/${project.id}?tab=payments`}>
+                  Payments
+                  <ArrowRight aria-hidden="true" />
+                </Link>
+              </Button>
+            }
+          >
             <dl className="flex flex-col divide-y divide-border-soft text-sm">
               <MoneyRow label="Project cost" value={projectCost} strong />
-              <MoneyRow label="Advance received" value={advance} />
+              <MoneyRow label="Received" value={advance} />
               <MoneyRow label="Balance due" value={Math.max(projectCost - advance, 0)} />
               <MoneyRow label="Material — estimated" value={estimated} />
               <MoneyRow label="Material — approved" value={approved} />

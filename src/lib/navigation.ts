@@ -194,9 +194,14 @@ export const FORBIDDEN_PATH = "/forbidden";
 
 const PUBLIC_EXACT = new Set(["/login", "/forgot-password", "/reset-password"]);
 
-/** Paths reachable without a session. */
+/** Paths reachable without a session (`/statement/<token>` is the client payment statement). */
 export function isPublicPath(pathname: string): boolean {
-  return PUBLIC_EXACT.has(pathname) || pathname === "/auth" || pathname.startsWith("/auth/");
+  return (
+    PUBLIC_EXACT.has(pathname) ||
+    pathname === "/auth" ||
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith("/statement/")
+  );
 }
 
 /**

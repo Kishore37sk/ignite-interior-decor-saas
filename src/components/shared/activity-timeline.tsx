@@ -37,6 +37,8 @@ const ENTITY_LABELS: Record<string, string> = {
   project_members: "Team",
   project_documents: "Document",
   project_financials: "Financials",
+  project_payments: "Payment",
+  project_payment_links: "Payment Link",
   clients: "Client",
   material_requests: "Material Request",
   material_request_items: "Material Item",

@@ -68,6 +68,7 @@ export default async function EditProjectPage({ params }: PageProps) {
         clients={clientOptions}
         siteManagers={smOptions}
         cancelHref={`/projects/${project.id}`}
+        receivedSoFar={Number(financials?.advance_received ?? 0)}
         defaults={{
           client_id: project.client_id,
           name: project.name,
@@ -84,7 +85,7 @@ export default async function EditProjectPage({ params }: PageProps) {
           progress_percentage: String(project.progress_percentage ?? 0),
           notes: project.notes ?? "",
           project_cost: numberText(financials?.project_cost),
-          advance_received: numberText(financials?.advance_received),
+          advance_received: "",
           site_manager_id: currentSm ?? "",
         }}
       />

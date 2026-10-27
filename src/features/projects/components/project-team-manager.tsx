@@ -325,7 +325,7 @@ function AssignDialog({
             <Checkbox checked={canView} onCheckedChange={(v) => setCanView(v === true)} className="mt-0.5" />
             <span>
               Can view financials
-              <span className="block text-xs text-muted">Project cost, advance and material cost totals.</span>
+              <span className="block text-xs text-muted">Project cost, payments received and material cost totals.</span>
             </span>
           </label>
         </DialogBody>

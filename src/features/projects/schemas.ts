@@ -11,6 +11,7 @@ import {
   optionalMoney,
   optionalText,
   optionalUuid,
+  paymentModeSchema,
   percentage,
   prioritySchema,
   projectStatusSchema,
@@ -48,7 +49,9 @@ export const projectFormSchema = z
     progress_percentage: percentage,
     notes: optionalText(4000, "Notes"),
     project_cost: optionalMoney,
+    // Create only: becomes the first entry in the payments ledger.
     advance_received: optionalMoney,
+    advance_mode: z.preprocess(emptyToUndefined, paymentModeSchema.optional()),
     site_manager_id: optionalUuid,
   })
   .superRefine((v, ctx) => {
@@ -90,6 +93,9 @@ export const projectFormSchema = z
         path: ["advance_received"],
         message: "Advance received can't be more than the project cost.",
       });
+    }
+    if (v.advance_received !== null && v.advance_received > 0 && !v.advance_mode) {
+      ctx.addIssue({ code: "custom", path: ["advance_mode"], message: "Choose how the advance was paid." });
     }
   });
 

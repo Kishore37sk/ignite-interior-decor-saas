@@ -94,6 +94,8 @@ describe("route access", () => {
     expect(isPublicPath("/reset-password")).toBe(true);
     expect(isPublicPath("/dashboard")).toBe(false);
     expect(isPublicPath("/authors")).toBe(false);
+    expect(isPublicPath("/statement/abc123")).toBe(true);
+    expect(isPublicPath("/statements")).toBe(false);
   });
 });
 

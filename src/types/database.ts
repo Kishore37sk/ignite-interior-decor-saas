@@ -56,6 +56,7 @@ export type DocumentCategory =
   | "material_documents"
   | "site_reports"
   | "other";
+export type PaymentMode = "cash" | "card" | "upi" | "bank_transfer" | "cheque" | "other";
 
 /** Derived (non-enum) text states exposed by views. */
 export type MemberStatus = "active" | "removed";
@@ -167,6 +168,31 @@ type ProjectFinancialsRow = {
   notes: string | null;
   updated_at: string;
   updated_by: string | null;
+};
+
+type ProjectPaymentRow = {
+  id: string;
+  project_id: string;
+  amount: number;
+  /** `YYYY-MM-DD`. */
+  paid_on: string;
+  mode: PaymentMode;
+  /** Shown to the client on the shared statement (UPI / transaction ID, cheque number). */
+  reference: string | null;
+  /** Internal only; never shown on the shared statement. */
+  notes: string | null;
+  created_at: string;
+  created_by: string | null;
+  updated_at: string;
+  updated_by: string | null;
+};
+
+/** Owner-only: the secret token behind /statement/<token>. */
+type ProjectPaymentLinkRow = {
+  project_id: string;
+  token: string;
+  created_at: string;
+  created_by: string | null;
 };
 
 type ProjectMemberRow = {
@@ -369,6 +395,7 @@ type ProjectFinancialSummaryViewRow = {
   status: ProjectStatus;
   archived_at: string | null;
   project_cost: number;
+  /** Amount received: the sum of project_payments (0009). */
   advance_received: number | null;
   material_estimated_cost: number;
   material_approved_cost: number;
@@ -377,6 +404,8 @@ type ProjectFinancialSummaryViewRow = {
   material_variance: number;
   material_variance_estimated_cost: number;
   material_variance_actual_cost: number;
+  payment_count: number;
+  last_payment_on: string | null;
 };
 
 type ClientDirectoryViewRow = ClientRow & {
@@ -477,6 +506,28 @@ export type GlobalSearchResult = {
   title: string;
   subtitle: string | null;
   href: string;
+};
+
+/** get_payment_statement() result (0009). Amounts are JSON numbers. */
+export type PaymentStatement = {
+  company: {
+    name: string;
+    phone: string | null;
+    email: string | null;
+    address: string | null;
+    logo_url: string | null;
+  } | null;
+  project: {
+    code: string;
+    name: string;
+    city: string | null;
+    status: ProjectStatus;
+    client_name: string;
+  };
+  totals: { project_cost: number; received: number; balance: number };
+  by_mode: Array<{ mode: PaymentMode; amount: number; count: number }>;
+  payments: Array<{ paid_on: string; mode: PaymentMode; amount: number; reference: string | null }>;
+  generated_at: string;
 };
 
 export type OwnerDashboardStats = {
@@ -628,6 +679,16 @@ export type Database = {
         ProjectFinancialsRow,
         "project_id",
         [Rel<"project_financials_project_id_fkey", "project_id", "projects", true>]
+      >;
+      project_payments: TableDef<
+        ProjectPaymentRow,
+        "project_id" | "amount" | "mode",
+        [Rel<"project_payments_project_id_fkey", "project_id", "projects">]
+      >;
+      project_payment_links: TableDef<
+        ProjectPaymentLinkRow,
+        "project_id",
+        [Rel<"project_payment_links_project_id_fkey", "project_id", "projects", true>]
       >;
       project_members: TableDef<
         ProjectMemberRow,
@@ -851,6 +912,8 @@ export type Database = {
         Returns: SiteManagerDashboardStats;
       };
       get_admin_dashboard: { Args: Record<PropertyKey, never>; Returns: AdminDashboardStats };
+      /** Public (anon) share-link statement; null for an unknown or disabled token. */
+      get_payment_statement: { Args: { p_token: string }; Returns: PaymentStatement | null };
     };
     Enums: {
       app_role: AppRole;
@@ -861,6 +924,7 @@ export type Database = {
       milestone_status: MilestoneStatus;
       member_role: MemberRole;
       document_category: DocumentCategory;
+      payment_mode: PaymentMode;
     };
     CompositeTypes: Record<PropertyKey, never>;
   };
@@ -893,6 +957,8 @@ export type MaterialCategory = Tables<"material_categories">;
 export type Client = Tables<"clients">;
 export type Project = Tables<"projects">;
 export type ProjectFinancials = Tables<"project_financials">;
+export type ProjectPayment = Tables<"project_payments">;
+export type ProjectPaymentLink = Tables<"project_payment_links">;
 export type ProjectMember = Tables<"project_members">;
 export type ProjectMilestone = Tables<"project_milestones">;
 export type ProjectUpdate = Tables<"project_updates">;

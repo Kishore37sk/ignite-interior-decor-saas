@@ -11,8 +11,16 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { ActionResult, FieldErrors } from "@/lib/action-result";
-import { PRIORITY_LABELS, PRIORITY_LEVELS, PROJECT_STATUSES, PROJECT_STATUS_LABELS } from "@/lib/constants";
+import {
+  PAYMENT_MODES,
+  PAYMENT_MODE_LABELS,
+  PRIORITY_LABELS,
+  PRIORITY_LEVELS,
+  PROJECT_STATUSES,
+  PROJECT_STATUS_LABELS,
+} from "@/lib/constants";
 import { todayIST } from "@/lib/dates";
+import { formatINR } from "@/lib/format";
 import type { PriorityLevel, ProjectStatus } from "@/types/database";
 import { createProjectAction, updateProjectAction, type ProjectSaveResult } from "../actions";
 import { PROJECT_TYPE_SUGGESTIONS } from "../constants";
@@ -49,10 +57,12 @@ export type ProjectFormProps = {
   clients: readonly ClientOption[];
   siteManagers: readonly SiteManagerOption[];
   cancelHref: string;
+  /** Edit mode: amount received so far (payments are managed on the Payments tab). */
+  receivedSoFar?: number;
 };
 
 /** Owner project create/edit form (project, dates, status, cost, site manager). */
-export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, cancelHref }: ProjectFormProps) {
+export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, cancelHref, receivedSoFar = 0 }: ProjectFormProps) {
   const router = useRouter();
   const [projectType, setProjectType] = useState(defaults.project_type);
   const [pending, startTransition] = useTransition();
@@ -203,9 +213,33 @@ export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, 
           <FormField label="Project cost (₹)" name="project_cost" error={err("project_cost")}>
             <Input inputMode="decimal" defaultValue={defaults.project_cost} leading={<span className="text-sm">₹</span>} placeholder="0" />
           </FormField>
-          <FormField label="Advance received (₹)" name="advance_received" error={err("advance_received")}>
-            <Input inputMode="decimal" defaultValue={defaults.advance_received} leading={<span className="text-sm">₹</span>} placeholder="0" />
-          </FormField>
+          {mode === "create" ? (
+            <>
+              <FormField label="Advance received (₹)" name="advance_received" error={err("advance_received")}>
+                <Input inputMode="decimal" defaultValue={defaults.advance_received} leading={<span className="text-sm">₹</span>} placeholder="0" />
+              </FormField>
+              <FormField
+                label="Advance paid by"
+                name="advance_mode"
+                error={err("advance_mode")}
+                hint="Saved as the first payment. Add later payments from the project's Payments tab."
+              >
+                <Select
+                  defaultValue=""
+                  placeholder="Choose a mode"
+                  options={PAYMENT_MODES.map((value) => ({ value, label: PAYMENT_MODE_LABELS[value] }))}
+                />
+              </FormField>
+            </>
+          ) : (
+            <div className="flex flex-col gap-1 rounded-xl bg-surface-muted p-4">
+              <span className="text-xs font-medium text-muted">Received so far</span>
+              <span className="text-base font-semibold tabular-nums text-text">{formatINR(receivedSoFar)}</span>
+              <Link href={`/projects/${projectId}?tab=payments`} className="w-fit text-sm font-medium text-primary-strong hover:underline">
+                Manage payments
+              </Link>
+            </div>
+          )}
           <FormField label="Notes" name="notes" error={err("notes")} className="md:col-span-2">
             <Textarea rows={4} defaultValue={defaults.notes} maxLength={4000} />
           </FormField>

@@ -28,6 +28,8 @@ export const ACTIVITY_ENTITY_LABELS: Record<string, string> = {
   project_members: "Team Assignment",
   project_documents: "Document",
   project_financials: "Financials",
+  project_payments: "Payment",
+  project_payment_links: "Payment Link",
   clients: "Client",
   material_requests: "Material Request",
   material_request_items: "Material Item",
@@ -85,6 +87,9 @@ export function activityHref(entry: Pick<ActivityFeedEntry, "entity_type" | "ent
       return projectId ? `/projects/${projectId}${PROJECT_TABS[type] ? `?tab=${PROJECT_TABS[type]}` : ""}` : null;
     case "project_financials":
       return role === "owner" && projectId ? `/projects/${projectId}` : null;
+    case "project_payments":
+    case "project_payment_links":
+      return role === "owner" && projectId ? `/projects/${projectId}?tab=payments` : null;
     case "material_requests":
       return id ? `/material-requests/${id}` : null;
     case "material_request_items":

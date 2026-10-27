@@ -33,6 +33,10 @@ describe("activityHref", () => {
     expect(activityHref({ ...base, entity_type: "clients" }, "admin")).toBeNull();
     expect(activityHref({ ...base, entity_type: "company_settings" }, "site_manager")).toBeNull();
     expect(activityHref({ ...base, entity_type: "project_financials" }, "site_manager")).toBeNull();
+    expect(activityHref({ ...base, entity_type: "project_payments" }, "site_manager")).toBeNull();
+  });
+  it("links payment rows to the payments tab for the owner", () => {
+    expect(activityHref({ ...base, entity_type: "project_payments" }, "owner")).toBe("/projects/p1?tab=payments");
   });
 });
 
@@ -41,6 +45,7 @@ describe("entityTypesForRole", () => {
     for (const role of ["admin", "site_manager"] as const) {
       const types = entityTypesForRole(role);
       expect(types).not.toContain("project_financials");
+      expect(types).not.toContain("project_payments");
       expect(types).not.toContain("clients");
     }
   });

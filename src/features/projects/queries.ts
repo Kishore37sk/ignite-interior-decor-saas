@@ -300,7 +300,7 @@ export async function getProjectFinancials(id: string): Promise<ProjectFinancial
   const { data, error } = await supabase
     .from("project_financial_summary")
     .select(
-      "project_id, project_code, project_name, client_id, client_name, project_cost, advance_received, material_estimated_cost, material_approved_cost, material_actual_cost, material_variance, material_variance_estimated_cost, material_variance_actual_cost, status, archived_at",
+      "project_id, project_code, project_name, client_id, client_name, project_cost, advance_received, material_estimated_cost, material_approved_cost, material_actual_cost, material_variance, material_variance_estimated_cost, material_variance_actual_cost, status, archived_at, payment_count, last_payment_on",
     )
     .eq("project_id", id)
     .maybeSingle();

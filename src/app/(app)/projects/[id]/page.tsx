@@ -17,6 +17,8 @@ import { isClosedProjectStatus } from "@/lib/constants";
 import { formatDate, relativeTime } from "@/lib/dates";
 import { getParam, parseEnumParam, parsePage, parsePageSize, type SearchParamsRecord } from "@/lib/search-params";
 import { uuid } from "@/lib/validation/common";
+import { PaymentsTab } from "@/features/payments/components/payments-tab";
+import { canViewProjectFinancials } from "@/features/payments/queries";
 import { ProjectArchiveButton } from "@/features/projects/components/project-archive-button";
 import { ActivityTab } from "@/features/projects/components/tabs/activity-tab";
 import { DocumentsTab } from "@/features/projects/components/tabs/documents-tab";
@@ -67,8 +69,15 @@ export default async function ProjectDetailPage({ params, searchParams }: PagePr
   const isOwner = user.role === "owner";
   // Progress updates and documents are visible only to the owner and project members (RLS):
   // hide those tabs from admins who reach the project through a material request.
-  const memberOnlyTabs = user.role !== "admin" || (await isActiveProjectMember(project.id));
-  const visibleTabs = PROJECT_TABS.filter((value) => memberOnlyTabs || (value !== "updates" && value !== "documents"));
+  // Payments: the owner and members the owner granted financial access.
+  const [memberOnlyTabs, financeTab] = await Promise.all([
+    user.role !== "admin" || isActiveProjectMember(project.id),
+    isOwner || canViewProjectFinancials(project.id),
+  ]);
+  const visibleTabs = PROJECT_TABS.filter(
+    (value) =>
+      (memberOnlyTabs || (value !== "updates" && value !== "documents")) && (financeTab || value !== "payments"),
+  );
   const requestedTab = parseEnumParam(query, "tab", PROJECT_TABS) ?? "overview";
   const tab = visibleTabs.includes(requestedTab) ? requestedTab : "overview";
   const isAssignedSm = user.role === "site_manager" && project.site_manager_ids.includes(user.id);
@@ -128,6 +137,9 @@ export default async function ProjectDetailPage({ params, searchParams }: PagePr
       break;
     case "materials":
       content = <MaterialsTab projectId={project.id} showCosts={isOwner} />;
+      break;
+    case "payments":
+      content = <PaymentsTab project={project} canManage={isOwner} />;
       break;
     case "documents":
       content = (
