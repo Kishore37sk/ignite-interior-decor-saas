@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { WORK_SCOPES } from "@/lib/constants";
 import { todayIST } from "@/lib/dates";
 import {
   checkbox,
@@ -38,6 +39,11 @@ export const projectFormSchema = z
     name: requiredText("Project name", 160),
     project_code: projectCode,
     project_type: optionalText(60, "Project type"),
+    // Repeated FormData keys arrive as an array; a single checkbox as a string.
+    work_scope: z.preprocess(
+      (v) => (v === undefined || v === null || v === "" ? [] : Array.isArray(v) ? v : [v]),
+      z.array(z.enum(WORK_SCOPES, { error: "Choose areas from the list." })),
+    ).transform((list) => WORK_SCOPES.filter((key) => list.includes(key))),
     site_address: optionalText(500, "Site address"),
     city: optionalText(80, "City"),
     start_date: optionalDate,

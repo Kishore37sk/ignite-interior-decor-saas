@@ -159,6 +159,8 @@ type ProjectRow = {
   created_at: string;
   updated_at: string;
   created_by: string | null;
+  /** Scope of work keys (WORK_SCOPES); empty = not specified. */
+  work_scope: string[];
 };
 
 type ProjectFinancialsRow = {

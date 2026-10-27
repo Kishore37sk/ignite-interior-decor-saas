@@ -25,6 +25,7 @@ import type { PriorityLevel, ProjectStatus } from "@/types/database";
 import { createProjectAction, updateProjectAction, type ProjectSaveResult } from "../actions";
 import { PROJECT_TYPE_SUGGESTIONS } from "../constants";
 import { ClientCombobox, type ClientOption } from "./client-combobox";
+import { WorkScopePicker } from "./work-scope-picker";
 
 const PROJECT_TYPE_OPTIONS = PROJECT_TYPE_SUGGESTIONS.map((type) => ({ value: type }));
 
@@ -33,6 +34,7 @@ export type ProjectFormDefaults = {
   name: string;
   project_code: string;
   project_type: string;
+  work_scope: string[];
   site_address: string;
   city: string;
   start_date: string;
@@ -136,7 +138,7 @@ export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, 
           >
             <Input defaultValue={defaults.project_code} maxLength={20} className="uppercase" autoCapitalize="characters" />
           </FormField>
-          <FormField label="Project type" name="project_type" error={err("project_type")} hint="Pick a suggestion or type your own.">
+          <FormField label="Project type" name="project_type" error={err("project_type")} hint="The kind of property, e.g. Villa or Apartment. Pick or type your own.">
             <Combobox
               listLabel="Project types"
               options={PROJECT_TYPE_OPTIONS}
@@ -148,6 +150,9 @@ export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, 
           <FormField label="City" name="city" error={err("city")}>
             <Input defaultValue={defaults.city} maxLength={80} autoComplete="address-level2" />
           </FormField>
+          <div className="md:col-span-2">
+            <WorkScopePicker defaultValue={defaults.work_scope} error={err("work_scope")?.[0]} />
+          </div>
           <FormField label="Site address" name="site_address" error={err("site_address")} className="md:col-span-2">
             <Textarea rows={2} defaultValue={defaults.site_address} maxLength={500} />
           </FormField>

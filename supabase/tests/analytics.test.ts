@@ -360,3 +360,26 @@ describe("read models", () => {
     expect(p1?.site_manager_ids).toEqual([smA.id]);
   });
 });
+
+describe("project scope of work (0011)", () => {
+  it("stores known scope keys and exposes them in project_directory", async () => {
+    await t.sql("update public.projects set work_scope = array['living_room', 'modular_kitchen'] where id = $1", [
+      p.p1 as string,
+    ]);
+    const row = await t.asUser(owner.id, (tx) =>
+      tx.query<{ work_scope: string[] }>("select work_scope from public.project_directory where id = $1", [p.p1 as string]),
+    );
+    expect(row.rows[0]?.work_scope).toEqual(["living_room", "modular_kitchen"]);
+  });
+
+  it("defaults to an empty scope and rejects unknown keys", async () => {
+    const fresh = await t.one<{ work_scope: string[] }>(
+      "select work_scope from public.projects where id <> $1 limit 1",
+      [p.p1 as string],
+    );
+    expect(fresh.work_scope).toEqual([]);
+    await expect(
+      t.sql("update public.projects set work_scope = array['garage'] where id = $1", [p.p1 as string]),
+    ).rejects.toThrow(/projects_work_scope_chk/);
+  });
+});

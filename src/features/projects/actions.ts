@@ -44,6 +44,7 @@ function projectColumns(values: ProjectFormValues) {
     client_id: values.client_id ?? "",
     name: values.name,
     project_type: values.project_type,
+    work_scope: values.work_scope,
     site_address: values.site_address,
     city: values.city,
     start_date: values.start_date,

@@ -43,6 +43,7 @@ export default async function NewProjectPage({ searchParams }: PageProps) {
           name: "",
           project_code: "",
           project_type: "",
+          work_scope: [],
           site_address: "",
           city: preselectedClient?.city ?? "",
           start_date: "",

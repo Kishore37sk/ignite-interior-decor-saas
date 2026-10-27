@@ -74,6 +74,7 @@ export default async function EditProjectPage({ params }: PageProps) {
           name: project.name,
           project_code: project.project_code,
           project_type: project.project_type ?? "",
+          work_scope: project.work_scope ?? [],
           site_address: project.site_address ?? "",
           city: project.city ?? "",
           start_date: project.start_date ?? "",

@@ -4,6 +4,7 @@ import {
   CalendarClock,
   CalendarRange,
   Flag,
+  LayoutGrid,
   MapPin,
   MessageSquareText,
   StickyNote,
@@ -22,6 +23,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import type { CurrentUser } from "@/lib/auth";
+import { formatWorkScope } from "@/lib/constants";
 import { formatDate, formatDateTime, relativeTime } from "@/lib/dates";
 import { formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -204,6 +206,7 @@ export async function OverviewTab({ project, user, canPostUpdate }: OverviewTabP
           <div className="flex flex-col gap-4">
             <InfoList columns={2}>
               <InfoRow icon={Tag} label="Project type" value={project.project_type} />
+              <InfoRow icon={LayoutGrid} label="Scope of work" value={formatWorkScope(project.work_scope)} />
               <InfoRow icon={MapPin} label="Site" value={location || null} />
             </InfoList>
             {project.notes ? (

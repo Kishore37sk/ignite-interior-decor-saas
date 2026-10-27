@@ -32,6 +32,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { requireRole } from "@/lib/auth";
+import { formatWorkScope } from "@/lib/constants";
 import { formatDate } from "@/lib/dates";
 import { logServerError, toFriendlyError } from "@/lib/errors";
 import { formatINR, pluralize } from "@/lib/format";
@@ -310,6 +311,7 @@ export default async function ClientDetailPage({ params }: PageProps) {
                           <p className="text-xs font-medium text-muted">
                             {project.project_code}
                             {project.project_type ? ` · ${project.project_type}` : ""}
+                            {formatWorkScope(project.work_scope) ? ` · ${formatWorkScope(project.work_scope)}` : ""}
                             {project.city ? ` · ${project.city}` : ""}
                           </p>
                           <h3 className="mt-0.5 text-base font-semibold text-text">

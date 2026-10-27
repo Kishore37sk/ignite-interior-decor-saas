@@ -368,10 +368,47 @@ export const PROJECT_TYPES = [
   "Office",
   "Retail",
   "Hospitality",
-  "Modular Kitchen",
   "Renovation",
   "Other",
 ] as const;
+
+/** Scope of work (projects.work_scope); keys mirror the 0011 check constraint. */
+export const WORK_SCOPES = [
+  "living_room",
+  "modular_kitchen",
+  "dining_room",
+  "pooja_unit",
+  "1bhk",
+  "2bhk",
+  "3bhk",
+  "home_theatre",
+  "false_ceiling",
+  "tv_unit",
+  "first_floor_living_room",
+] as const;
+export type WorkScope = (typeof WORK_SCOPES)[number];
+
+export const WORK_SCOPE_LABELS: Record<WorkScope, string> = {
+  living_room: "Living Room",
+  modular_kitchen: "Modular Kitchen",
+  dining_room: "Dining Room",
+  pooja_unit: "Pooja Unit",
+  "1bhk": "1BHK",
+  "2bhk": "2BHK",
+  "3bhk": "3BHK",
+  home_theatre: "Home Theatre",
+  false_ceiling: "False Ceiling",
+  tv_unit: "TV Unit",
+  first_floor_living_room: "First Floor Living Room",
+};
+
+/** "All areas" when every scope is selected, otherwise the labels in list order. */
+export function formatWorkScope(scope: readonly string[] | null | undefined): string | null {
+  const known = WORK_SCOPES.filter((key) => scope?.includes(key));
+  if (known.length === 0) return null;
+  if (known.length === WORK_SCOPES.length) return "All areas";
+  return known.map((key) => WORK_SCOPE_LABELS[key]).join(", ");
+}
 
 /** Day thresholds for deadline reminders (mirrors generate_deadline_notifications). */
 export const DEADLINE_REMINDER_DAYS = [30, 14, 7, 1, 0] as const;
