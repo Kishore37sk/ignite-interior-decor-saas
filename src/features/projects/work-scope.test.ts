@@ -3,7 +3,14 @@ import { formatWorkScope, WORK_SCOPES } from "@/lib/constants";
 import { projectFormSchema } from "./schemas";
 import { PROJECT_TYPE_SUGGESTIONS } from "./constants";
 
-const base = { client_id: "11111111-1111-4111-8111-111111111111", name: "Test", status: "planning", priority: "medium", progress_percentage: "0" };
+const base = {
+  client_id: "11111111-1111-4111-8111-111111111111",
+  name: "Test",
+  project_type: "Villa",
+  status: "planning",
+  priority: "medium",
+  progress_percentage: "0",
+};
 
 describe("project scope of work", () => {
   it("accepts one, many or no areas and keeps the canonical order", () => {
@@ -13,6 +20,15 @@ describe("project scope of work", () => {
       "tv_unit",
     ]);
     expect(projectFormSchema.parse(base).work_scope).toEqual([]);
+  });
+
+  it("keeps a scope only for Villa, Apartment and Residential projects", () => {
+    for (const type of ["Villa", "apartment", " Residential "]) {
+      expect(projectFormSchema.parse({ ...base, project_type: type, work_scope: ["2bhk"] }).work_scope, type).toEqual(["2bhk"]);
+    }
+    for (const type of ["Office", "Commercial", "Farmhouse", ""]) {
+      expect(projectFormSchema.parse({ ...base, project_type: type, work_scope: ["2bhk"] }).work_scope, type).toEqual([]);
+    }
   });
 
   it("rejects unknown areas", () => {

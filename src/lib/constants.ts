@@ -402,6 +402,14 @@ export const WORK_SCOPE_LABELS: Record<WorkScope, string> = {
   first_floor_living_room: "First Floor Living Room",
 };
 
+/** Project types that take a scope of work (other types never store one). */
+export const SCOPE_PROJECT_TYPES = ["Villa", "Apartment", "Residential"] as const;
+
+export function projectTypeHasScope(projectType: string | null | undefined): boolean {
+  const type = projectType?.trim().toLowerCase();
+  return Boolean(type) && SCOPE_PROJECT_TYPES.some((t) => t.toLowerCase() === type);
+}
+
 /** "All areas" when every scope is selected, otherwise the labels in list order. */
 export function formatWorkScope(scope: readonly string[] | null | undefined): string | null {
   const known = WORK_SCOPES.filter((key) => scope?.includes(key));

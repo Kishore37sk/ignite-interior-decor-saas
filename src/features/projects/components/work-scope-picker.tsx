@@ -8,15 +8,19 @@ import { cn } from "@/lib/utils";
 export type WorkScopePickerProps = {
   defaultValue: readonly string[];
   error?: string;
+  /** Hidden (and nothing submitted) unless the project type takes a scope; the selection is kept. */
+  visible: boolean;
+  className?: string;
 };
 
 /** Scope of work checkboxes with "All areas"; submits one `work_scope` field per selected area. */
-export function WorkScopePicker({ defaultValue, error }: WorkScopePickerProps) {
+export function WorkScopePicker({ defaultValue, error, visible, className }: WorkScopePickerProps) {
   const id = useId();
   const [selected, setSelected] = useState<Set<WorkScope>>(
     () => new Set(WORK_SCOPES.filter((key) => defaultValue.includes(key))),
   );
   const all = selected.size === WORK_SCOPES.length;
+  if (!visible) return null;
 
   function toggle(key: WorkScope, on: boolean) {
     setSelected((prev) => {
@@ -28,7 +32,7 @@ export function WorkScopePicker({ defaultValue, error }: WorkScopePickerProps) {
   }
 
   return (
-    <fieldset className="flex flex-col gap-3" aria-describedby={error ? `${id}-error` : `${id}-hint`}>
+    <fieldset className={cn("flex flex-col gap-3", className)} aria-describedby={error ? `${id}-error` : `${id}-hint`}>
       <legend className="text-sm font-medium text-text">Scope of work</legend>
       <p id={`${id}-hint`} className="-mt-1 text-xs text-muted">
         Which areas are included in this project? Choose one or more, or all.

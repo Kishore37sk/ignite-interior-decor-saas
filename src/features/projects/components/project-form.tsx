@@ -18,6 +18,7 @@ import {
   PRIORITY_LEVELS,
   PROJECT_STATUSES,
   PROJECT_STATUS_LABELS,
+  projectTypeHasScope,
 } from "@/lib/constants";
 import { todayIST } from "@/lib/dates";
 import { formatINR } from "@/lib/format";
@@ -150,9 +151,13 @@ export function ProjectForm({ mode, projectId, defaults, clients, siteManagers, 
           <FormField label="City" name="city" error={err("city")}>
             <Input defaultValue={defaults.city} maxLength={80} autoComplete="address-level2" />
           </FormField>
-          <div className="md:col-span-2">
-            <WorkScopePicker defaultValue={defaults.work_scope} error={err("work_scope")?.[0]} />
-          </div>
+          {/* Stays mounted so the selection survives switching the type away and back. */}
+          <WorkScopePicker
+            visible={projectTypeHasScope(projectType)}
+            defaultValue={defaults.work_scope}
+            error={err("work_scope")?.[0]}
+            className="md:col-span-2"
+          />
           <FormField label="Site address" name="site_address" error={err("site_address")} className="md:col-span-2">
             <Textarea rows={2} defaultValue={defaults.site_address} maxLength={500} />
           </FormField>

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { WORK_SCOPES } from "@/lib/constants";
+import { projectTypeHasScope, WORK_SCOPES } from "@/lib/constants";
 import { todayIST } from "@/lib/dates";
 import {
   checkbox,
@@ -103,7 +103,9 @@ export const projectFormSchema = z
     if (v.advance_received !== null && v.advance_received > 0 && !v.advance_mode) {
       ctx.addIssue({ code: "custom", path: ["advance_mode"], message: "Choose how the advance was paid." });
     }
-  });
+  })
+  // Only Villa / Apartment / Residential projects carry a scope of work.
+  .transform((v) => (projectTypeHasScope(v.project_type) ? v : { ...v, work_scope: [] }));
 
 export type ProjectFormValues = z.output<typeof projectFormSchema>;
 
