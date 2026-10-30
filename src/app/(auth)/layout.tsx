@@ -1,5 +1,6 @@
 import { CalendarClock, ClipboardCheck, IndianRupee, LayoutDashboard } from "lucide-react";
 import type { ReactNode } from "react";
+import { DeveloperCredit } from "@/components/shared/developer-credit";
 import { BRAND } from "@/lib/constants";
 
 // Auth pages read cookies/search params per request.
@@ -93,9 +94,10 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         <div className="flex flex-1 items-center justify-center py-6">
           <div className="w-full max-w-[440px]">{children}</div>
         </div>
-        <p className="text-center text-sm text-muted">
-          © {new Date().getFullYear()} {BRAND.name}
-        </p>
+        <div className="flex flex-col items-center gap-1 text-center text-sm text-muted">
+          <p>© {new Date().getFullYear()} {BRAND.name}</p>
+          <DeveloperCredit />
+        </div>
       </main>
       <BrandPanel />
     </div>

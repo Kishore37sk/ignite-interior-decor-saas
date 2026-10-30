@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { DeveloperCredit } from "@/components/shared/developer-credit";
 import { BRAND } from "@/lib/constants";
 
 type StatusScreenProps = {
@@ -30,6 +31,7 @@ export function StatusScreen({ icon: Icon, code, title, description, actions }: 
       <p className="mt-8 text-sm text-muted">
         © {new Date().getFullYear()} {BRAND.name}
       </p>
+      <DeveloperCredit className="mt-1" />
     </main>
   );
 }

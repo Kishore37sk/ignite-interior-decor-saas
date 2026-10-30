@@ -22,6 +22,12 @@ export const BRAND = {
   logo: "/brand/logo.png",
 } as const;
 
+/** Footer credit on every page. */
+export const DEVELOPER = {
+  name: "Kishore Kumar",
+  url: "https://kishore37sk.github.io/personal_website/",
+} as const;
+
 export const APP_TIMEZONE = "Asia/Kolkata";
 export const APP_LOCALE = "en-IN";
 export const APP_CURRENCY = "INR";

@@ -1,5 +1,7 @@
 "use client";
 
+import { DEVELOPER } from "@/lib/constants";
+
 /**
  * Last-resort boundary when the root layout itself fails. It replaces the whole
  * document, so it renders its own <html>/<body> and uses inline styles only
@@ -19,6 +21,7 @@ export default function GlobalError({
           margin: 0,
           minHeight: "100dvh",
           display: "flex",
+          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           background: "#F5F6F4",
@@ -67,6 +70,12 @@ export default function GlobalError({
             Try again
           </button>
         </main>
+        <p style={{ marginTop: 16, fontSize: 13, color: "#5E6D66" }}>
+          Developed by{" "}
+          <a href={DEVELOPER.url} target="_blank" rel="noopener noreferrer" style={{ color: "#1A7F63", fontWeight: 600 }}>
+            {DEVELOPER.name}
+          </a>
+        </p>
       </body>
     </html>
   );

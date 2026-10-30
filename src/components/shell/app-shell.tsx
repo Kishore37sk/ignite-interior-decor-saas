@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { BRAND } from "@/lib/constants";
+import { DeveloperCredit } from "@/components/shared/developer-credit";
 import { cn } from "@/lib/utils";
 import { SiteManagerBottomNav } from "./mobile-nav";
 import { Sidebar } from "./sidebar";
@@ -66,7 +67,7 @@ export function AppShell({ user, companyName, companyLogoUrl = null, notificatio
           <p>
             <span className="font-semibold text-text">© {year} {BRAND.name}</span>
           </p>
-          <p>{BRAND.tagline}</p>
+          <DeveloperCredit />
         </footer>
       </div>
       {isSiteManager ? <SiteManagerBottomNav /> : null}

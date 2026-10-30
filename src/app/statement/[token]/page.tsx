@@ -2,6 +2,7 @@ import { Link2Off, Mail, Phone } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import { CurrencyText } from "@/components/shared/currency-text";
+import { DeveloperCredit } from "@/components/shared/developer-credit";
 import { BRAND, PAYMENT_MODE_LABELS } from "@/lib/constants";
 import { formatDate, formatDateTime } from "@/lib/dates";
 import { PAYMENT_MODE_ICONS, PaymentModeBreakdown, PaymentTotalsGrid } from "@/features/payments/components/payment-summary";
@@ -41,6 +42,7 @@ export default async function PaymentStatementPage({ params }: PageProps) {
         <p className="text-sm text-muted">
           The payment link may have been replaced or turned off. Please ask {BRAND.name} for the latest link.
         </p>
+        <DeveloperCredit className="mt-6 text-xs" />
       </main>
     );
   }
@@ -138,6 +140,7 @@ export default async function PaymentStatementPage({ params }: PageProps) {
           For questions about this statement, please contact {companyName}
           {company?.phone ? ` on ${company.phone}` : ""}.
         </p>
+        <DeveloperCredit className="mt-2 text-xs" />
       </footer>
     </main>
   );
